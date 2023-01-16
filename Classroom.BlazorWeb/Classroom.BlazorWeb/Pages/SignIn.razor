@@ -1,0 +1,63 @@
+﻿@page "/signin"
+@inject HttpClient Http
+@inject NavigationManager _navigationManager
+
+<MudCard Elevation="3" Class="pa-6" Style="width:350px;margin: auto">
+    <MudForm>
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudText Style="margin: auto;
+                            font-size: large;
+                            font-weight: bold;">CLASSROOM</MudText>
+        </div>
+        <MudDivider></MudDivider>
+        <MudTextField T="string" @ref="_username" Label="Username" MaxLength="50" Variant="Variant.Outlined"
+            Margin="Margin.Normal" Required="true" RequiredError="The Username field is required." />
+        <MudTextField T="string" @ref="_textFieldPassword" Label="Password" MaxLength="50" Variant="Variant.Outlined"
+            Margin="Margin.Normal" Required="true" RequiredError="The Password field is required."
+            InputType="@_passwordInput" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
+            OnAdornmentClick="PasswordShow" AdornmentAriaLabel="Show Password" />
+        <MudButton Variant="Variant.Filled" Color="Color.Info" Size="Size.Large" Class="mt-4" OnClick="SignInAsync"
+            FullWidth="true">Sign in</MudButton>
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudText Style="margin: auto;">New on our platform? <MudLink Href="/signup">Create an account</MudLink>
+            </MudText>
+        </div>
+    </MudForm>
+</MudCard>
+
+@code {
+    MudTextField<string>? _textFieldPassword;
+    private MudTextField<string>? _username;
+    bool _isShow;
+    InputType _passwordInput = InputType.Password;
+    string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+    void PasswordShow()
+    {
+        @if (_isShow)
+        {
+            _isShow = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _isShow = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+
+    private async Task SignInAsync()
+    {
+        var signInUser = new { UserName = _username?.Value, Password = _textFieldPassword?.Value };
+        var result = await Http.PostAsJsonAsync("/api/account/signin", signInUser);
+        if (result.IsSuccessStatusCode)
+        {
+            _navigationManager.NavigateTo("/profile");
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/signin");
+        }
+    }
+}

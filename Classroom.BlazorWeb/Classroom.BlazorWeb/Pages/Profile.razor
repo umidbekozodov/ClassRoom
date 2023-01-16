@@ -1,0 +1,15 @@
+﻿@page "/profile"
+@inject HttpClient Http
+
+<MudText>@_userData</MudText>
+
+@code {
+    private string? _userData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var message = new HttpRequestMessage(HttpMethod.Get, "/api/account/string2");
+        message.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+        _userData = await (await Http.SendAsync(message)).Content.ReadAsStringAsync();
+    }
+}
